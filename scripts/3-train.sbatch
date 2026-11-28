@@ -8,7 +8,7 @@
 #SBATCH --output=slurm-%j.out
 # Train ACT on one GPU of the WMI cluster (https://cluster.wmi.amu.edu.pl).
 #
-# Usage. Run this from the example02 directory on access.cluster.wmi.amu.edu.pl:
+# Run from the Doggo Pro project directory on access.cluster.wmi.amu.edu.pl:
 #   sbatch scripts/3-train.sbatch <hf-user>/<dataset-name> [job-name] [extra lerobot-train args...]
 #
 # The #SBATCH lines must come directly after the shebang.
@@ -41,10 +41,14 @@ module load ffmpeg
 CACHE="/work/$USER/.cache"
 export UV_CACHE_DIR="$CACHE/uv"
 export HF_LEROBOT_HOME="$CACHE/huggingface/lerobot"
+export HF_HUB_CACHE="$CACHE/huggingface/hub"
+export HF_DATASETS_CACHE="$CACHE/huggingface/datasets"
 
 # evdev is a Linux keyboard library that pynput needs. Training does not use
 # it, and it has no wheel, so uv must build it with a compiler.
-uv sync --no-install-package evdev
+uv sync --locked --no-install-project --no-install-package evdev
+# LeRobot's training CLI needs Accelerate, which is outside the core-scripts extra.
+uv --no-config pip install --python .venv/bin/python 'accelerate>=1.14,<2'
 
 # Stop `uv run` in 3-train.sh from a second sync. That sync installs evdev.
 export UV_NO_SYNC=1

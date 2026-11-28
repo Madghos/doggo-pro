@@ -7,7 +7,12 @@ $ErrorActionPreference='Stop'
 $Root=Split-Path -Parent $PSScriptRoot
 $Python=Join-Path $Root '.venv\Scripts\python.exe'
 $Name=($Repo -split '/')[-1]
-$ArgsList=@('-m','dog_sim.record_auto',"--dataset.repo_id=$Repo", "--dataset.root=outputs/datasets/$Name", '--dataset.no_stamp=true','--dataset.push_to_hub=false',"--dataset.num_episodes=$Episodes",'--dataset.single_task=Move the dog to the green disk','--dataset.video=false','--dataset.fps=30') + @($ExtraArgs)
+$ArgsList=@(
+  '-m','dog_sim.record_auto',"--dataset.repo_id=$Repo","--dataset.root=outputs/datasets/$Name",
+  '--dataset.no_stamp=true','--dataset.push_to_hub=false',"--dataset.num_episodes=$Episodes",
+  '--dataset.single_task=Walk to point B','--dataset.video=false','--dataset.fps=30',
+  '--dataset.episode_time_s=20'
+) + @($ExtraArgs)
 Push-Location $Root
 try {& $Python @ArgsList; if ($LASTEXITCODE -ne 0) {throw "Auto-record failed $LASTEXITCODE"}}
 finally {Pop-Location}
